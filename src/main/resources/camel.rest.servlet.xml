@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+         http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+
+    <jaxws:endpoint
+            id="contactServiceEndpoint"
+            implementor="com.activeeon.contact.ContactService"
+            address="/contact-service"/>
+
+    <bean id="contactService" class="com.activeeon.contact.ContactService"/>
+
+    <camelContext id="contact-service" xmlns="http://camel.apache.org/schema/spring">
+
+        <restConfiguration component="servlet" bindingMode="json"
+                           contextPath="contact-service/rest"
+                           apiContextPath="api-docs" apiContextListing="true"
+                           enableCORS="true">
+
+            <!-- we want json output in pretty mode -->
+            <dataFormatProperty key="prettyPrint" value="true"/>
+
+            <!-- setup swagger api descriptions -->
+            <apiProperty key="base.path" value="rest"/>
+            <apiProperty key="host" value="127.0.0.1:8080"/>
+            <apiProperty key="api.version" value="1.0"/>
+            <apiProperty key="api.title" value="Contact Rest API"/>
+            <apiProperty key="api.description" value="Contact Rest API"/>
+            <apiProperty key="api.contact.name" value="Clement Caron"/>
+
+        </restConfiguration>
+
+        <!-- defines the rest services using the context-path /user -->
+        <rest path="/contact" consumes="application/json" produces="application/json">
+            <description>Contact rest service</description>
+
+            <!-- this is a rest GET to find a contact by phone number -->
+            <get uri="/phone-number/{id}" outType="com.activeeon.contact.Contact">
+                <description>Find contact by phone number</description>
+                <param name="id" type="path" description="The phone number of the contact to get" dataType="string"/>
+                <responseMessage message="The contact that was found"/>
+                <responseMessage code="404" message="Contact not found"/>
+                <route>
+                    <to uri="bean:contactService?method=getContactByPhoneNumber(${header.id})"/>
+                    <filter>
+                        <simple>${body} == null</simple>
+                        <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
+                            <constant>404</constant>
+                        </setHeader>
+                    </filter>
+                </route>
+            </get>
+
+            <!-- this is a rest GET to find (a) contact(s) by name -->
+            <get uri="/name/{id}" outType="com.activeeon.contact.Contact[]">
+                <description>Find contact(s) by name</description>
+                <param name="id" type="path" description="The name of the contact to get" dataType="string"/>
+                <responseMessage message="The list of contact found"/>
+                <to uri="bean:contactService?method=getContactsByName(${header.id})"/>
+            </get>
+
+            <!-- this is a rest GET to find (a) contact(s) by subname -->
+            <get uri="/subname/{id}" outType="com.activeeon.contact.Contact[]">
+                <description>Find contact(s) by subname</description>
+                <param name="id" type="path" description="The subname of the contact to get" dataType="string"/>
+                <responseMessage message="The list of contact found"/>
+                <to uri="bean:contactService?method=getContactsBySubName(${header.id})"/>
+            </get>
+
+            <!-- this is a rest GET to find all contacts -->
+            <get uri="/getAllContacts" outType="com.activeeon.contact.Contact[]">
+                <description>Find all users</description>
+                <responseMessage message="All the users"/>
+                <to uri="bean:contactService?method=getAllContacts"/>
+            </get>
+
+            <!-- this is a rest POST to create a contact -->
+            <post type="com.activeeon.contact.Contact">
+                <description>Create new Contact</description>
+                <param name="body" type="body" description="The contact to create"/>
+                <responseMessage message="True if creation taken into account, false otherwise"/>
+                <to uri="bean:contactService?method=createContact"/>
+            </post>
+
+            <!-- this is a rest PUT to update a contact -->
+            <put type="com.activeeon.contact.Contact">
+                <description>Update a Contact</description>
+                <param name="body" type="body" description="The contact to update"/>
+                <responseMessage message="True if update taken into account, false otherwise"/>
+                <to uri="bean:contactService?method=updateContact"/>
+            </put>
+
+            <!-- this is a rest DELETE to delete a contact -->
+            <delete type="com.activeeon.contact.Contact">
+                <description>Delete a Contact</description>
+                <param name="body" type="body" description="The contact to delete"/>
+                <responseMessage message="True if deletion taken into account, false otherwise"/>
+                <to uri="bean:contactService?method=deleteContact"/>
+            </delete>
+        </rest>
+
+    </camelContext>
+
+</beans>

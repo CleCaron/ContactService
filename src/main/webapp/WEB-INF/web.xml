@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+
+<web-app>
+
+  <listener>
+    <listener-class>
+      org.springframework.web.context.ContextLoaderListener
+    </listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>CXFServlet</servlet-name>
+    <display-name>CXF Servlet</display-name>
+    <servlet-class>
+      org.apache.cxf.transport.servlet.CXFServlet
+    </servlet-class>
+    <init-param>
+      <param-name>redirects-list</param-name>
+      <param-value></param-value>
+    </init-param>
+    <init-param>
+      <param-name>redirect-attributes</param-name>
+      <param-value>
+        javax.servlet.include.request_uri
+      </param-value>
+    </init-param>
+    <init-param>
+      <param-name>redirect-servlet-name</param-name>
+      <param-value>default</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+    <servlet-mapping>
+      <servlet-name>RESTServlet</servlet-name>
+      <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>CXFServlet</servlet-name>
+    <url-pattern>/soap/*</url-pattern>
+  </servlet-mapping>
+
+
+  <display-name>Contact Rest Service</display-name>
+
+  <!-- location of Camel Spring xml files -->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:camel.rest.servlet.xml</param-value>
+  </context-param>
+
+  <!-- to setup Camel Servlet -->
+  <servlet>
+    <display-name>Camel Http Transport Servlet</display-name>
+    <servlet-name>CamelServlet</servlet-name>
+    <servlet-class>org.apache.camel.component.servlet.CamelHttpTransportServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <!-- define that url index.html for the Camel Servlet to use -->
+  <servlet-mapping>
+    <servlet-name>CamelServlet</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+</web-app>
