@@ -3,13 +3,11 @@ package com.activeeon.contact;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.jws.WebService;
 import java.util.List;
 
 /**
  * Created by Clement Caron on 09/11/2016.
  */
-@WebService(endpointInterface = "com.activeeon.contact.ContactInterface")
 public class ContactService implements ContactInterface {
     private static final Logger LOGGER = LogManager.getLogger(ContactService.class.getName());
     private final DatabaseConnector dataBaseConnector = new DatabaseConnector();

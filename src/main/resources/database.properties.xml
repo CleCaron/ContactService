@@ -3,6 +3,4 @@
 <properties>
   <comment>Configuration required to connect with the database</comment>
   <entry key="database.url">jdbc:h2:./contact</entry>
-  <entry key="database.username">contact</entry>
-  <entry key="database.password">contact</entry>
 </properties>

@@ -40,11 +40,6 @@
     </servlet-mapping>
   </servlet>
 
-  <servlet-mapping>
-    <servlet-name>CXFServlet</servlet-name>
-    <url-pattern>/soap/*</url-pattern>
-  </servlet-mapping>
-
 
   <display-name>Contact Rest Service</display-name>
 

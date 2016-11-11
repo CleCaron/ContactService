@@ -9,11 +9,6 @@
 
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
 
-    <jaxws:endpoint
-            id="contactServiceEndpoint"
-            implementor="com.activeeon.contact.ContactService"
-            address="/contact-service"/>
-
     <bean id="contactService" class="com.activeeon.contact.ContactService"/>
 
     <camelContext id="contact-service" xmlns="http://camel.apache.org/schema/spring">
